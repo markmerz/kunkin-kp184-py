@@ -164,12 +164,16 @@ class Kunkin_KP184:
 
     def get_U_measure(self):
         rr = self.client.read_holding_registers(0x0122, count=4, unit=self.UNIT)
+        if rr.isError():
+            raise ValueError(rr)
         decoder = BinaryPayloadDecoder.fromRegisters(rr.registers, wordorder=Endian.Big, byteorder=Endian.Big)
         voltage = decoder.decode_32bit_uint() / 1000
         return voltage
 
     def get_I_measure(self):
         rr = self.client.read_holding_registers(0x0126, count=4, unit=self.UNIT)
+        if rr.isError():
+            raise ValueError(rr)
         decoder = BinaryPayloadDecoder.fromRegisters(rr.registers, wordorder=Endian.Big, byteorder=Endian.Big)
         amperage = decoder.decode_32bit_uint() / 1000
         return amperage
@@ -185,6 +189,8 @@ class Kunkin_KP184:
 
     def get_load_mode(self):
         rr = self.client.read_holding_registers(0x0110, count=4, unit=self.UNIT)
+        if rr.isError():
+            raise ValueError(rr)
         decoder = BinaryPayloadDecoder.fromRegisters(rr.registers, wordorder=Endian.Big, byteorder=Endian.Big)
         res = decoder.decode_32bit_uint()
         return self.LOAD_MODE[res & 0xFF]
@@ -202,6 +208,8 @@ class Kunkin_KP184:
 
     def get_load_onoff(self):
         rr = self.client.read_holding_registers(0x010E, count=4, unit=self.UNIT)
+        if rr.isError():
+            raise ValueError(rr)
         decoder = BinaryPayloadDecoder.fromRegisters(rr.registers, wordorder=Endian.Big, byteorder=Endian.Big)
         res = decoder.decode_32bit_uint()
         return self.LOAD_ONOFF[res & 0xFF]
@@ -226,6 +234,8 @@ class Kunkin_KP184:
 
     def get_CV_setting(self):
         rr = self.client.read_holding_registers(0x0112, count=4, unit=self.UNIT)
+        if rr.isError():
+            raise ValueError(rr)
         decoder = BinaryPayloadDecoder.fromRegisters(rr.registers, wordorder=Endian.Big, byteorder=Endian.Big)
         voltage = decoder.decode_32bit_uint() / 1000        
         return voltage
@@ -241,6 +251,8 @@ class Kunkin_KP184:
 
     def get_CC_setting(self):
         rr = self.client.read_holding_registers(0x0116, count=4, unit=self.UNIT)
+        if rr.isError():
+            raise ValueError(rr)
         decoder = BinaryPayloadDecoder.fromRegisters(rr.registers, wordorder=Endian.Big, byteorder=Endian.Big)
         amperage = decoder.decode_32bit_uint() / 1000
         return amperage
@@ -256,6 +268,8 @@ class Kunkin_KP184:
     
     def get_CR_setting(self):
         rr = self.client.read_holding_registers(0x011A, count=4, unit=self.UNIT)
+        if rr.isError():
+            raise ValueError(rr)
         decoder = BinaryPayloadDecoder.fromRegisters(rr.registers, wordorder=Endian.Big, byteorder=Endian.Big)
         resistance = decoder.decode_32bit_uint() / 10
         return resistance
@@ -271,6 +285,8 @@ class Kunkin_KP184:
 
     def get_CW_setting(self):
         rr = self.client.read_holding_registers(0x011E, count=4, unit=self.UNIT)
+        if rr.isError():
+            raise ValueError(rr)
         decoder = BinaryPayloadDecoder.fromRegisters(rr.registers, wordorder=Endian.Big, byteorder=Endian.Big)
         power = decoder.decode_32bit_uint() / 100
         return power
