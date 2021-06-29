@@ -16,9 +16,11 @@ def main():
     requested_mode = None
     dcload = Kunkin_KP184()
 
+    if len(sys.argv) < 2:
+        print_help_and_exit()
     for param in sys.argv[1:]:
         if mode_seen == True:            
-            mode_value = float(param)
+            mode_value = float(param.replace(',', '.'))
             if requested_mode == "CV":
                 dcload.set_CV_setting(mode_value)
                 print("Configured Constant Voltage is {} V".format(dcload.get_CV_setting()))
@@ -127,7 +129,10 @@ def main():
                 workmode = dcload.get_load_mode()
                 print("Work mode is {}".format(workmode))
         else:
-            print(
+            print_help_and_exit()            
+
+def print_help_and_exit():
+    print(
             """Usage: kunkin-kp184.py status
 Usage: kunkin-kp184.py on
 Usage: kunkin-kp184.py off
@@ -137,9 +142,7 @@ Usage: kunkin-kp184.py cr 200
 Usage: kunkin-kp184.py cv 0.3
 Usage: kunkin-kp184.py cc 0.5 on status"""
             , file=sys.stderr)
-            sys.exit(1)
-
-    
+    sys.exit(1)    
 
 class Kunkin_KP184:
     client = None
