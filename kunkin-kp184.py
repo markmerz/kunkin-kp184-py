@@ -1,14 +1,25 @@
 #!/usr/bin/python3
 
-# udevadm info -q path -n /dev/ttyUSB1
-MY_DEVICE = "/devices/pci0000:00/0000:00:14.0/usb3/3-3/3-3.4/3-3.4.4/3-3.4.4:1.0/"
+# preferred when using usb-serial adapter. Works around annoyance that device hooks 
+# and com-port names are rearranged between reboots and plugging-unplugging. Addresses
+# devices by physical location in usb ports, including usb hubs. Works in both linux
+# and windows(10).
+# Get list of Your serial devices:
+# $ python -m serial.tools.list_ports -v
+# "LOCATION" field is physical usb port.
+MY_DEVICE = "1-2"
 
+# Internal serial port in windows:
+# MY_DEVICE = "COM1"
+
+# Internal serial port in linux:
+# MY_DEVICE = "/dev/ttyS0"
+
+import serial.tools.list_ports
 from pymodbus.client.sync import ModbusSerialClient as ModbusClient
 from pymodbus.payload import BinaryPayloadBuilder, BinaryPayloadDecoder
 from pymodbus.constants import Endian
 import math
-import glob
-import subprocess
 import sys
 
 def main():
@@ -151,14 +162,16 @@ class Kunkin_KP184:
     LOAD_MODE = ["CV", "CC", "CR", "CW"]
 
     def __init__(self):
-        for dev_hook in glob.iglob("/dev/ttyUSB*"):
-            result = subprocess.run(["udevadm", "info", "-q", "path", "-n", dev_hook], stdout=subprocess.PIPE)
-            res = result.stdout.decode('utf-8').strip()
-            if res.startswith(MY_DEVICE):
-                self.client = ModbusClient(method="rtu", port=dev_hook, timeout=0.2, baudrate=9600, stopbits=1, bytesize=8, parity="N")
-                break
+        if MY_DEVICE.startswith("/dev") or MY_DEVICE.upper().startswith("COM"):
+            dev_hook = MY_DEVICE
         else:
-            raise ValueError("Serial port or adapter was not found at {}".format(MY_DEVICE))
+            for cport in serial.tools.list_ports.comports():
+                if cport.location == MY_DEVICE:
+                    dev_hook = cport.device                
+                    break
+            else:
+                raise ValueError("Serial port or adapter was not found at {}".format(MY_DEVICE))
+        self.client = ModbusClient(method="rtu", port=dev_hook, timeout=0.2, baudrate=9600, stopbits=1, bytesize=8, parity="N")        
 
     def __del__(self):
         if self is not None:

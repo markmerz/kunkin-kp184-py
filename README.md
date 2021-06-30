@@ -2,7 +2,7 @@
 
 Python program for managing Kunkin KP184 electronic DC load.
 
-This program is linux-specific because that is what i'm using in my lab but porting to other os'es is not that difficult. Feel free to fork.
+Works with linux and windows10.
 
 Usage: kunkin-kp184.py status
 
